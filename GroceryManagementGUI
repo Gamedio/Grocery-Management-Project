@@ -46,14 +46,14 @@ public class GroceryManagementGUI extends JFrame {
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new AddGroceryDialog(groceryShop);
+                showAddGroceryDialog();
             }
         });
 
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new SearchGroceryDialog(groceryShop);
+                showSearchGroceryDialog();
             }
         });
 
@@ -81,13 +81,117 @@ public class GroceryManagementGUI extends JFrame {
         add(mainPanel);
     }
 
+    private void showAddGroceryDialog() {
+        JDialog addDialog = new JDialog(this, "Add Grocery Item", true);
+        addDialog.setSize(400, 300);
+        addDialog.setLayout(new GridLayout(6, 2, 10, 10));
+        addDialog.setLocationRelativeTo(this);
+
+        JLabel nameLabel = new JLabel("Name:");
+        JTextField nameField = new JTextField();
+        JLabel manufacturerLabel = new JLabel("Manufacturer:");
+        JTextField manufacturerField = new JTextField();
+        JLabel priceLabel = new JLabel("Price:");
+        JTextField priceField = new JTextField();
+        JLabel quantityLabel = new JLabel("Quantity:");
+        JTextField quantityField = new JTextField();
+        JLabel typeLabel = new JLabel("Type:");
+        String[] types = {"Edible", "NonEdible"};
+        JComboBox<String> typeComboBox = new JComboBox<>(types);
+        JButton addButton = new JButton("Add");
+
+        addDialog.add(nameLabel);
+        addDialog.add(nameField);
+        addDialog.add(manufacturerLabel);
+        addDialog.add(manufacturerField);
+        addDialog.add(priceLabel);
+        addDialog.add(priceField);
+        addDialog.add(quantityLabel);
+        addDialog.add(quantityField);
+        addDialog.add(typeLabel);
+        addDialog.add(typeComboBox);
+        addDialog.add(new JLabel());
+        addDialog.add(addButton);
+
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String name = nameField.getText();
+                String manufacturer = manufacturerField.getText();
+                double price;
+                int quantity;
+                try {
+                    price = Double.parseDouble(priceField.getText());
+                    quantity = Integer.parseInt(quantityField.getText());
+                    String type = (String) typeComboBox.getSelectedItem();
+
+                    if (type.equals("Edible")) {
+                        int expirationDays = Integer.parseInt(JOptionPane.showInputDialog("Enter expiration days:"));
+                        Edibles ed = new Edibles(name, manufacturer, price, quantity, expirationDays);
+                        if (groceryShop.insertGrocery(ed)) {
+                            JOptionPane.showMessageDialog(addDialog, "Edible Grocery Item Added Successfully!");
+                        } else {
+                            JOptionPane.showMessageDialog(addDialog, "Failed to Add Edible Grocery Item!");
+                        }
+                    } else {
+                        String materialType = JOptionPane.showInputDialog("Enter material type:");
+                        NonEdibles ned = new NonEdibles(name, manufacturer, price, quantity, materialType);
+                        if (groceryShop.insertGrocery(ned)) {
+                            JOptionPane.showMessageDialog(addDialog, "Non-Edible Grocery Item Added Successfully!");
+                        } else {
+                            JOptionPane.showMessageDialog(addDialog, "Failed to Add Non-Edible Grocery Item!");
+                        }
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(addDialog, "Price and Quantity must be numeric!");
+                }
+
+                addDialog.dispose();
+            }
+        });
+
+        addDialog.setVisible(true);
+    }
+
+    private void showSearchGroceryDialog() {
+        JDialog searchDialog = new JDialog(this, "Search Grocery Item", true);
+        searchDialog.setSize(400, 200);
+        searchDialog.setLayout(new GridLayout(3, 2, 10, 10));
+        searchDialog.setLocationRelativeTo(this);
+
+        JLabel nameLabel = new JLabel("Name:");
+        JTextField nameField = new JTextField();
+        JButton searchButton = new JButton("Search");
+
+        searchDialog.add(nameLabel);
+        searchDialog.add(nameField);
+        searchDialog.add(new JLabel());
+        searchDialog.add(searchButton);
+
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String name = nameField.getText();
+                int index = groceryShop.searchGroceryName(name);
+                if (index != -1) {
+                    Grocery grocery = groceryShop.groceries[index];
+                    JOptionPane.showMessageDialog(searchDialog, "Grocery Item Found: " + grocery.getGroceryName() + "\nQuantity: " + grocery.getavailableQuantity());
+                } else {
+                    JOptionPane.showMessageDialog(searchDialog, "Grocery Item Not Found!");
+                }
+                searchDialog.dispose();
+            }
+        });
+
+        searchDialog.setVisible(true);
+    }
+
     private void populateDummyGroceries() {
         String[] dummy = {"Apple", "Orange", "Tomatoes", "Potatoes", "Bread", "Frying Pan", "Kitchen Knife", "Soap", "Shampoo", "ToothPaste"};
 
         for (int i = 0; i < 10; i++) {
             if (i < 5) {
                 Edibles ed1 = new Edibles(dummy[i], "BestFood", 25, 50, 5);
-
                 if (groceryShop.insertGrocery(ed1)) {
                     JOptionPane.showMessageDialog(this, "Adding dummy Edible Grocery was Successful");
                 } else {
@@ -95,7 +199,6 @@ public class GroceryManagementGUI extends JFrame {
                 }
             } else {
                 NonEdibles ned1 = new NonEdibles(dummy[i], "BestBrand", 25, 50, "materials");
-
                 if (groceryShop.insertGrocery(ned1)) {
                     JOptionPane.showMessageDialog(this, "Adding dummy NonEdible Grocery was Successful");
                 } else {
