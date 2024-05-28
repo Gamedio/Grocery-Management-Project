@@ -1,0 +1,62 @@
+package grocery;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class ManageGroceryDialog extends JDialog {
+    private GroceryShop groceryShop;
+    private Grocery grocery;
+
+    public ManageGroceryDialog(GroceryShop groceryShop, Grocery grocery) {
+        this.groceryShop = groceryShop;
+        this.grocery = grocery;
+
+        setTitle("Manage Grocery Item");
+        setSize(400, 300);
+        setLayout(new GridLayout(4, 2, 10, 10));
+        setLocationRelativeTo(null);
+
+        addComponents();
+        setVisible(true);
+    }
+
+    private void addComponents() {
+        JLabel nameLabel = new JLabel("Name: " + grocery.getGroceryName());
+        JLabel quantityLabel = new JLabel("Current Quantity: " + grocery.getavailableQuantity());
+        JLabel amountLabel = new JLabel("Amount:");
+        JTextField amountField = new JTextField();
+        JButton sellButton = new JButton("Sell");
+        JButton restockButton = new JButton("Restock");
+
+        add(nameLabel);
+        add(new JLabel());
+        add(quantityLabel);
+        add(new JLabel());
+        add(amountLabel);
+        add(amountField);
+        add(sellButton);
+        add(restockButton);
+
+        sellButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int amount = Integer.parseInt(amountField.getText());
+                grocery.sell(amount);
+                JOptionPane.showMessageDialog(ManageGroceryDialog.this, "Sold " + amount + " units of " + grocery.getGroceryName());
+                dispose();
+            }
+        });
+
+        restockButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int amount = Integer.parseInt(amountField.getText());
+                grocery.restock(amount);
+                JOptionPane.showMessageDialog(ManageGroceryDialog.this, "Restocked " + amount + " units of " + grocery.getGroceryName());
+                dispose();
+            }
+        });
+    }
+}
