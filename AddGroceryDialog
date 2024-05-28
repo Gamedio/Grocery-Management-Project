@@ -1,0 +1,79 @@
+package grocery;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class AddGroceryDialog extends JDialog {
+    private GroceryShop groceryShop;
+
+    public AddGroceryDialog(GroceryShop groceryShop) {
+        this.groceryShop = groceryShop;
+
+        setTitle("Add Grocery Item");
+        setSize(400, 300);
+        setLayout(new GridLayout(6, 2, 10, 10));
+        setLocationRelativeTo(null);
+
+        addComponents();
+        setVisible(true);
+    }
+
+    private void addComponents() {
+        JLabel nameLabel = new JLabel("Name:");
+        JTextField nameField = new JTextField();
+        JLabel manufacturerLabel = new JLabel("Manufacturer:");
+        JTextField manufacturerField = new JTextField();
+        JLabel priceLabel = new JLabel("Price:");
+        JTextField priceField = new JTextField();
+        JLabel quantityLabel = new JLabel("Quantity:");
+        JTextField quantityField = new JTextField();
+        JLabel typeLabel = new JLabel("Type:");
+        String[] types = {"Edible", "NonEdible"};
+        JComboBox<String> typeComboBox = new JComboBox<>(types);
+        JButton addButton = new JButton("Add");
+
+        add(nameLabel);
+        add(nameField);
+        add(manufacturerLabel);
+        add(manufacturerField);
+        add(priceLabel);
+        add(priceField);
+        add(quantityLabel);
+        add(quantityField);
+        add(typeLabel);
+        add(typeComboBox);
+        add(new JLabel());
+        add(addButton);
+
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String name = nameField.getText();
+                String manufacturer = manufacturerField.getText();
+                double price = Double.parseDouble(priceField.getText());
+                int quantity = Integer.parseInt(quantityField.getText());
+                String type = (String) typeComboBox.getSelectedItem();
+
+                if (type.equals("Edible")) {
+                    Edibles edible = new Edibles(name, manufacturer, price, quantity, 5);
+                    if (groceryShop.insertGrocery(edible)) {
+                        JOptionPane.showMessageDialog(AddGroceryDialog.this, "Edible Grocery Added Successfully");
+                    } else {
+                        JOptionPane.showMessageDialog(AddGroceryDialog.this, "Failed to Add Edible Grocery");
+                    }
+                } else {
+                    NonEdibles nonEdible = new NonEdibles(name, manufacturer, price, quantity, "materials");
+                    if (groceryShop.insertGrocery(nonEdible)) {
+                        JOptionPane.showMessageDialog(AddGroceryDialog.this, "NonEdible Grocery Added Successfully");
+                    } else {
+                        JOptionPane.showMessageDialog(AddGroceryDialog.this, "Failed to Add NonEdible Grocery");
+                    }
+                }
+
+                dispose();
+            }
+        });
+    }
+}
