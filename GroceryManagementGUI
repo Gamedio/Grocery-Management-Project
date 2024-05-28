@@ -1,0 +1,130 @@
+package grocery;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class GroceryManagementGUI extends JFrame {
+    private GroceryShop groceryShop;
+
+    public GroceryManagementGUI() {
+        groceryShop = new GroceryShop();
+
+        setTitle("Grocery Shop Management");
+        setSize(600, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        initializeGUI();
+    }
+
+    private void initializeGUI() {
+        JPanel mainPanel = new JPanel(new BorderLayout());
+
+        // Top Panel for shop name
+        JPanel topPanel = new JPanel();
+        topPanel.add(new JLabel("Grocery Shop Name: " + groceryShop.shopName));
+        mainPanel.add(topPanel, BorderLayout.NORTH);
+
+        // Center Panel for buttons
+        JPanel centerPanel = new JPanel(new GridLayout(5, 1, 10, 10));
+        JButton addButton = new JButton("Add Grocery Item");
+        JButton searchButton = new JButton("Search Grocery Item");
+        JButton populateButton = new JButton("Populate Shop with Dummy Groceries");
+        JButton showAllButton = new JButton("Show All Groceries");
+        JButton exitButton = new JButton("Exit");
+
+        centerPanel.add(addButton);
+        centerPanel.add(searchButton);
+        centerPanel.add(populateButton);
+        centerPanel.add(showAllButton);
+        centerPanel.add(exitButton);
+        mainPanel.add(centerPanel, BorderLayout.CENTER);
+
+        // Add action listeners to buttons
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new AddGroceryDialog(groceryShop);
+            }
+        });
+
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new SearchGroceryDialog(groceryShop);
+            }
+        });
+
+        populateButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                populateDummyGroceries();
+            }
+        });
+
+        showAllButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showAllGroceries();
+            }
+        });
+
+        exitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+
+        add(mainPanel);
+    }
+
+    private void populateDummyGroceries() {
+        String[] dummy = {"Apple", "Orange", "Tomatoes", "Potatoes", "Bread", "Frying Pan", "Kitchen Knife", "Soap", "Shampoo", "ToothPaste"};
+
+        for (int i = 0; i < 10; i++) {
+            if (i < 5) {
+                Edibles ed1 = new Edibles(dummy[i], "BestFood", 25, 50, 5);
+
+                if (groceryShop.insertGrocery(ed1)) {
+                    JOptionPane.showMessageDialog(this, "Adding dummy Edible Grocery was Successful");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Sorry Edible Grocery Stock Full. Please sell the grocery product in a different shop. You can always create a new shop.");
+                }
+            } else {
+                NonEdibles ned1 = new NonEdibles(dummy[i], "BestBrand", 25, 50, "materials");
+
+                if (groceryShop.insertGrocery(ned1)) {
+                    JOptionPane.showMessageDialog(this, "Adding dummy NonEdible Grocery was Successful");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Sorry NonEdible Grocery Stock Full. Please sell the grocery product in a different shop. You can always create a new shop.");
+                }
+            }
+        }
+        JOptionPane.showMessageDialog(this, "Populating the shop with dummy values has been successful.");
+    }
+
+    private void showAllGroceries() {
+        StringBuilder allGroceries = new StringBuilder("Grocery Shop: " + groceryShop.shopName + "\n\n");
+
+        for (int i = 0; i < groceryShop.counter; i++) {
+            allGroceries.append(groceryShop.groceries[i].groceryName)
+                    .append(" - ")
+                    .append(groceryShop.groceries[i].availableQuantity)
+                    .append("\n");
+        }
+
+        JOptionPane.showMessageDialog(this, allGroceries.toString());
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new GroceryManagementGUI().setVisible(true);
+            }
+        });
+    }
+}
