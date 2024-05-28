@@ -1,0 +1,51 @@
+package grocery;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class SearchGroceryDialog extends JDialog {
+    private GroceryShop groceryShop;
+
+    public SearchGroceryDialog(GroceryShop groceryShop) {
+        this.groceryShop = groceryShop;
+
+        setTitle("Search Grocery Item");
+        setSize(400, 200);
+        setLayout(new GridLayout(3, 2, 10, 10));
+        setLocationRelativeTo(null);
+
+        addComponents();
+        setVisible(true);
+    }
+
+    private void addComponents() {
+        JLabel nameLabel = new JLabel("Name:");
+        JTextField nameField = new JTextField();
+        JButton searchButton = new JButton("Search");
+
+        add(nameLabel);
+        add(nameField);
+        add(new JLabel());
+        add(searchButton);
+
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String name = nameField.getText();
+                int index = groceryShop.searchGroceryName(name);
+
+                if (index == -1) {
+                    JOptionPane.showMessageDialog(SearchGroceryDialog.this, "Grocery Not Found");
+                } else {
+                    Grocery grocery = groceryShop.groceries[index];
+                    JOptionPane.showMessageDialog(SearchGroceryDialog.this, "Found Grocery: " + grocery.groceryName);
+                    new ManageGroceryDialog(groceryShop, grocery);
+                }
+
+                dispose();
+            }
+        });
+    }
+}
